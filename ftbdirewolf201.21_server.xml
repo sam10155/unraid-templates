@@ -8,7 +8,7 @@
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Project>https://feed-the-beast.com/modpack/126-ftb_presents_direwolf20_1_21</Project>
-  <Overview>FTB Presents Direwolf20 1.21 Modded Minecraft Server[br][br][b]FTB Presents Direwolf20 1.21[/b][br]Join Direwolf20 for an immersive Minecraft journey set in the minecraft 1.21 mod ecosystem. Brought to you by an FTB and Direwolf20 collaboration![br]Version tags available:[br] - 1.4.1[br] - 1.4.0[br] - 1.3.0[br][br][br]Setup:[br][li]You must accept the EULA by setting the [b]EULA[/b] variable to [span style='color: #00E800;']true[/span] or the install will fail.[br]Optional:[br][li]You can setup a comma separated list of players who will have admin privileges in game by setting [b]OPS[/b]</Overview>
+  <Overview>FTB Presents Direwolf20 1.21 Modded Minecraft Server[br][br][b]FTB Presents Direwolf20 1.21[/b][br]Join Direwolf20 for an immersive Minecraft journey set in the minecraft 1.21 mod ecosystem. Brought to you by an FTB and Direwolf20 collaboration![br][br][br]Setup:[br][li]You must accept the EULA by setting the [b]EULA[/b] variable to [span style='color: #00E800;']true[/span] or the install will fail.[br]Optional:[br][li]You can setup a comma separated list of players who will have admin privileges in game by setting [b]OPS[/b]</Overview>
   <Category>GameServers:</Category>
   <ExtraSearchTerms>minecraft</ExtraSearchTerms>
   <Icon>https://apps.modpacks.ch/modpacks/art/115/logo.png</Icon>
