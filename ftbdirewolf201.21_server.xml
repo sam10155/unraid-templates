@@ -95,5 +95,5 @@
       Description="Version of the modpack to download."
       Display="always"
       Required="false"
-      Mask="false">100090</Config>
+      Mask="false">100094</Config>
 </Container>
