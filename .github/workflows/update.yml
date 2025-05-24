@@ -65,7 +65,7 @@ jobs:
               # Update the text content inside the Config tag
               config.text = latest_ver
               break
-          tree.write(xml_path, encoding='utf-8', xml_declaration=True))
+          tree.write(xml_path, encoding='utf-8', xml_declaration=True)
 
           if original != updated:
               print("✏️ Updating XML file with new version...")
