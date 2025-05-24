@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <Container version="2">
   <Name>FTB Direwolf20 1.21</Name>
   <Repository>sam10155/ftbdirewolf20_121:latest</Repository>
   <Registry>https://hub.docker.com/repository/docker/sam10155/ftbdirewolf20_121</Registry>
   <Network>bridge</Network>
-  <MyIP/>
+  <MyIP />
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Project>https://feed-the-beast.com/modpack/126-ftb_presents_direwolf20_1_21</Project>
@@ -12,88 +12,22 @@
   <Category>GameServers:</Category>
   <ExtraSearchTerms>minecraft</ExtraSearchTerms>
   <Icon>https://apps.modpacks.ch/modpacks/art/115/logo.png</Icon>
-  <Labels/>
+  <Labels />
   
-  <!-- Configurations -->
-  <Config
-      Type="Path"
-      Name="Installed Location"
-      Target="/data"
-      Default="/mnt/user/appdata/ftbdirewolf20_121/"
-      Mode="rw"
-      Description="Path to store the installed server files."
-      Display="always"
-      Required="true"
-      Mask="false">/mnt/user/appdata/ftbdirewolf20_121/</Config>
+  
+  <Config Type="Path" Name="Installed Location" Target="/data" Default="/mnt/user/appdata/ftbdirewolf20_121/" Mode="rw" Description="Path to store the installed server files." Display="always" Required="true" Mask="false">/mnt/user/appdata/ftbdirewolf20_121/</Config>
 
-  <Config
-      Type="Variable"
-      Name="EULA"
-      Target="EULA"
-      Default="false"
-      Description="Do you agree to the Mojang EULA? Set to 'true' to accept."
-      Display="always"
-      Required="true"
-      Mask="false">false</Config>
+  <Config Type="Variable" Name="EULA" Target="EULA" Default="false" Description="Do you agree to the Mojang EULA? Set to 'true' to accept." Display="always" Required="true" Mask="false">false</Config>
 
-  <Config
-      Type="Variable"
-      Name="JVM_OPTS"
-      Target="JVM_OPTS"
-      Default="-Xms4096m -Xmx6144m"
-      Description="Java Options"
-      Display="always"
-      Required="false"
-      Mask="false">-Xms4096m -Xmx6144m</Config>
+  <Config Type="Variable" Name="JVM_OPTS" Target="JVM_OPTS" Default="-Xms4096m -Xmx6144m" Description="Java Options" Display="always" Required="false" Mask="false">-Xms4096m -Xmx6144m</Config>
 
-  <Config
-      Type="Variable"
-      Name="OPS"
-      Target="OPS"
-      Default=""
-      Description="Comma separated list of players to have op capability"
-      Display="always"
-      Required="false"
-      Mask="false"/>
+  <Config Type="Variable" Name="OPS" Target="OPS" Default="" Description="Comma separated list of players to have op capability" Display="always" Required="false" Mask="false" />
 
-  <Config
-      Type="Variable"
-      Name="MOTD"
-      Target="MOTD"
-      Default="FTB Presents Direwolf20 1.21 v1.4.1 Server Powered by Docker"
-      Description="Set the server MOTD"
-      Display="always"
-      Required="false"
-      Mask="false"/>
+  <Config Type="Variable" Name="MOTD" Target="MOTD" Default="FTB Presents Direwolf20 1.21 v1.4.1 Server Powered by Docker" Description="Set the server MOTD" Display="always" Required="false" Mask="false" />
 
-  <Config
-      Type="Port"
-      Name="Port"
-      Target="25565"
-      Default="25565"
-      Mode="tcp"
-      Description="Port for the server"
-      Display="always"
-      Required="false"
-      Mask="false">25565</Config>
+  <Config Type="Port" Name="Port" Target="25565" Default="25565" Mode="tcp" Description="Port for the server" Display="always" Required="false" Mask="false">25565</Config>
 
-  <Config
-      Type="Variable"
-      Name="LEVEL"
-      Target="LEVEL"
-      Default="world"
-      Description="Name of the world directory. It is usually world."
-      Display="advanced"
-      Required="false"
-      Mask="false">world</Config>
+  <Config Type="Variable" Name="LEVEL" Target="LEVEL" Default="world" Description="Name of the world directory. It is usually world." Display="advanced" Required="false" Mask="false">world</Config>
 
-  <Config
-      Type="Variable"
-      Name="VER"
-      Target="VER"
-      Default="100094" 
-      Description="Version of the modpack to download."
-      Display="always"
-      Required="false"
-      Mask="false">100094</Config>
+  <Config Type="Variable" Name="VER" Target="VER" Default="100095" Description="Version of the modpack to download." Display="always" Required="false" Mask="false">100095</Config>
 </Container>
