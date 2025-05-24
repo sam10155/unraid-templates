@@ -29,5 +29,5 @@
 
   <Config Type="Variable" Name="LEVEL" Target="LEVEL" Default="world" Description="Name of the world directory. It is usually world." Display="advanced" Required="false" Mask="false">world</Config>
 
-  <Config Type="Variable" Name="VER" Target="VER" Default="100095" Description="Version of the modpack to download." Display="always" Required="false" Mask="false">100095</Config>
+  <Config Type="Variable" Name="VER" Target="VER" Default="100094" Description="Version of the modpack to download." Display="always" Required="false" Mask="false">100094</Config>
 </Container>
