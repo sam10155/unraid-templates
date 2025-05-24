@@ -20,12 +20,14 @@ jobs:
 
       - name: Install dependencies
         run: pip install requests beautifulsoup4
+      
 
       - name: Scrape and update VER
         id: update_ver
         run: |
           python3 - <<EOF
           import requests, re, os
+          import xml.etree.ElementTree as ET
           from bs4 import BeautifulSoup
           from pathlib import Path
 
@@ -45,23 +47,25 @@ jobs:
           current_match = re.search(r'<Config[^>]*Name="VER"[^>]*Default="(\d+)"', original)
           current_ver = current_match.group(1) if current_match else "Unknown"
           print(f"📁 Current version in XML: {current_ver}")
-          
+
+          # Compare Version ID
           if current_ver == latest_ver:
               print("✅ No update needed. Version unchanged.")
               with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                   f.write("updated=false\n")
               exit(0)
 
-          updated = re.sub(
-              r'(<Config[^>]*Name="VER"[^>]*Default=")(\d+)(\")',
-              rf'\1{latest_ver}\3',
-              original
-          )
-          updated = re.sub(
-              r'(<Config[^>]*Name="VER"[^>]*>)(\d+)(</Config>)',
-              rf'\1{latest_ver}\3',
-              updated
-          )
+          # Replace updated VER ID in xml file
+          tree = ET.parse(xml_path)
+          root = tree.getroot()
+          for config in root.findall('Config'):
+            if config.attrib.get('Name') == 'VER':
+              # Update the Default attribute value
+              config.set('Default', latest_ver)
+              # Update the text content inside the Config tag
+              config.text = latest_ver
+              break
+          tree.write(xml_path, encoding='utf-8', xml_declaration=True))
 
           if original != updated:
               print("✏️ Updating XML file with new version...")
