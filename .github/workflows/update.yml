@@ -28,6 +28,7 @@ jobs:
           python3 - <<EOF
           import requests, re, os, io
           import xml.etree.ElementTree as ET
+          import xml.dom.minidom
           from bs4 import BeautifulSoup
           from pathlib import Path
 
@@ -67,7 +68,12 @@ jobs:
           # Serialize updated XML to string buffer with declaration
           buf = io.BytesIO()
           tree.write(buf, encoding='utf-8', xml_declaration=True)
-          new_xml_text = buf.getvalue().decode('utf-8')
+          new_xml_bytes = buf.getvalue()
+
+          # Pretty print with minidom
+          dom = xml.dom.minidom.parseString(new_xml_bytes)
+          pretty_xml_bytes = dom.toprettyxml(indent="  ", encoding='utf-8')
+          new_xml_text = pretty_xml_bytes.decode('utf-8')
 
           if original != new_xml_text:
               print("✏️ Updating XML file with new version...")
