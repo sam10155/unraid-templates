@@ -65,17 +65,37 @@ jobs:
                   config.text = latest_ver
                   break
 
-          # Serialize updated XML to string buffer with declaration
-          buf = io.BytesIO()
-          tree.write(buf, encoding='utf-8', xml_declaration=True)
-          new_xml_bytes = buf.getvalue()
+          def pretty_print_custom(elem, level=0):
+            indent = "  "
+            pad = indent * level
 
-          # Pretty print with minidom
-          dom = xml.dom.minidom.parseString(new_xml_bytes)
-          pretty_xml_bytes = dom.toprettyxml(indent="  ", encoding='utf-8')
-          new_xml_text = pretty_xml_bytes.decode('utf-8')
+            if elem.tag == "Config":
+              result = f"{pad}<{elem.tag}\n"
+              for key, val in elem.attrib.items():
+                result += f"{pad}{indent}{key}=\"{val}\"\n"
+              if elem.text and elem.text.strip():
+                result = result.rstrip()  # Remove trailing newline
+                result += f">{elem.text}</{elem.tag}>\n"
+              else:
+                result = result.rstrip()
+                result += "/>\n"
+              return result
 
-          if original != new_xml_text:
+            if (not elem.text or not elem.text.strip()) and len(elem) == 0:
+              return f"{pad}<{elem.tag}/>\n"
+
+            if elem.text and elem.text.strip():
+              return f"{pad}<{elem.tag}>{elem.text.strip()}</{elem.tag}>\n"
+
+            result = f"{pad}<{elem.tag}>\n"
+            for child in elem:
+              result += pretty_print_custom(child, level + 1)
+            result += f"{pad}</{elem.tag}>\n"
+            return result
+
+          final_xml = '<?xml version="1.0"?>\n' + pretty_print_custom(root)
+
+          if original != final_xml:
               print("✏️ Updating XML file with new version...")
               xml_path.write_text(new_xml_text, encoding='utf-8')
               with open(os.environ["GITHUB_OUTPUT"], "a") as f:
