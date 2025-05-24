@@ -1,0 +1,57 @@
+name: Update Unraid Template VER
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Scrape and update VER
+        id: update_ver
+        run: |
+          import requests, re
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+
+          url = "https://www.feed-the-beast.com/modpacks/126-ftb-presents-direwolf20-121"
+          xml_path = Path("ftbdirewolf20_121.xml")
+
+          print("Fetching latest modpack version...")
+          r = requests.get(url)
+          soup = BeautifulSoup(r.text, "html.parser")
+          div = soup.find("div", class_="Badge_value__1GilC")
+          latest_ver = div.text.strip()
+
+          print(f"Latest version: {latest_ver}")
+
+          original = xml_path.read_text()
+          updated = re.sub(r'(<Config[^>]*Name="VER"[^>]*Default=")\d+(")', r'\g<1>' + latest_ver + r'\2', original)
+          updated = re.sub(r'(<Config[^>]*Name="VER"[^>]*>)\d+(</Config>)', r'\g<1>' + latest_ver + r'\2', updated)
+
+          if original != updated:
+              xml_path.write_text(updated)
+              print("::set-output name=updated::true")
+              print(f"::set-output name=version::{latest_ver}")
+          else:
+              print("::set-output name=updated::false")
+
+      - name: Commit and push if updated
+        if: steps.update_ver.outputs.updated == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "Update VER to ${{ steps.update_ver.outputs.version }}"
+          git push
