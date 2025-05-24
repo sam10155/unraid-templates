@@ -24,7 +24,7 @@ jobs:
         id: update_ver
         run: |
           python3 - <<EOF
-          import requests, re
+          import requests, re, os
           from bs4 import BeautifulSoup
           from pathlib import Path
 
