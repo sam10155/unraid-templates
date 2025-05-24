@@ -71,7 +71,7 @@ jobs:
 
           if original != new_xml_text:
               print("✏️ Updating XML file with new version...")
-              xml_path.write_text(updated)
+              xml_path.write_text(new_xml_text, encoding='utf-8')
               with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                   f.write("updated=true\n")
                   f.write(f"version={latest_ver}\n")
