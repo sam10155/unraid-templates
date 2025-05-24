@@ -3,7 +3,6 @@ name: Update Unraid Template VER
 on:
   schedule:
     - cron: "0 0,12 * * *"  # At 00:00 and 12:00 UTC
-  push:
   workflow_dispatch:
 
 jobs:
@@ -54,13 +53,13 @@ jobs:
               exit(0)
 
           updated = re.sub(
-              r'(<Config[^>]*Name="VER"[^>]*Default=")\d+(")',
-              rf'\1{latest_ver}\2',
+              r'(<Config[^>]*Name="VER"[^>]*Default=")(\d+)(\")',
+              rf'\1{latest_ver}\3',
               original
           )
           updated = re.sub(
-              r'(<Config[^>]*Name="VER"[^>]*>)\d+(</Config>)',
-              rf'\1{latest_ver}\2',
+              r'(<Config[^>]*Name="VER"[^>]*>)(\d+)(</Config>)',
+              rf'\1{latest_ver}\3',
               updated
           )
 
