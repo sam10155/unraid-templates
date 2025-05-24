@@ -2,7 +2,8 @@ name: Update Unraid Template VER
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 0,12 * * *"  # At 00:00 and 12:00 UTC
+  push:
   workflow_dispatch:
 
 jobs:
@@ -22,31 +23,56 @@ jobs:
       - name: Scrape and update VER
         id: update_ver
         run: |
+          python3 - <<EOF
           import requests, re
           from bs4 import BeautifulSoup
           from pathlib import Path
 
           url = "https://www.feed-the-beast.com/modpacks/126-ftb-presents-direwolf20-121"
-          xml_path = Path("ftbdirewolf20_121.xml")
+          xml_path = Path("ftbdirewolf201.21_server.xml")
 
-          print("Fetching latest modpack version...")
+          print("🔎 Fetching latest modpack version...")
+
+          # Grab latest version ID
           r = requests.get(url)
           soup = BeautifulSoup(r.text, "html.parser")
-          div = soup.find("div", class_="Badge_value__1GilC")
-          latest_ver = div.text.strip()
+          latest_ver = soup.find("div", class_="Badge_value__1GilC").text.strip()
+          print(f"📦 Latest version found: {latest_ver}")
 
-          print(f"Latest version: {latest_ver}")
-
+          # Grab current version ID
           original = xml_path.read_text()
-          updated = re.sub(r'(<Config[^>]*Name="VER"[^>]*Default=")\d+(")', r'\g<1>' + latest_ver + r'\2', original)
-          updated = re.sub(r'(<Config[^>]*Name="VER"[^>]*>)\d+(</Config>)', r'\g<1>' + latest_ver + r'\2', updated)
+          current_match = re.search(r'<Config[^>]*Name="VER"[^>]*Default="(\d+)"', original)
+          current_ver = current_match.group(1) if current_match else "Unknown"
+          print(f"📁 Current version in XML: {current_ver}")
+          
+          if current_ver == latest_ver:
+              print("✅ No update needed. Version unchanged.")
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write("updated=false\n")
+              exit(0)
+
+          updated = re.sub(
+              r'(<Config[^>]*Name="VER"[^>]*Default=")\d+(")',
+              rf'\1{latest_ver}\2',
+              original
+          )
+          updated = re.sub(
+              r'(<Config[^>]*Name="VER"[^>]*>)\d+(</Config>)',
+              rf'\1{latest_ver}\2',
+              updated
+          )
 
           if original != updated:
+              print("✏️ Updating XML file with new version...")
               xml_path.write_text(updated)
-              print("::set-output name=updated::true")
-              print(f"::set-output name=version::{latest_ver}")
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write("updated=true\n")
+                  f.write(f"version={latest_ver}\n")
           else:
-              print("::set-output name=updated::false")
+              print("⚠️ Content already up to date.")
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write("updated=false\n")
+          EOF
 
       - name: Commit and push if updated
         if: steps.update_ver.outputs.updated == 'true'
