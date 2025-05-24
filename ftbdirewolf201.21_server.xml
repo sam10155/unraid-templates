@@ -87,11 +87,7 @@
       Required="false"
       Mask="false">world</Config>
 
-  <Config
-      Type="Variable"
-      Name="VER"
-      Target="VER"
-      Default="100027"
+  H0095"
       Description="Version of the modpack to download."
       Display="always"
       Required="false"
