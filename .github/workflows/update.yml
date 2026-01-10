@@ -8,6 +8,7 @@ on:
 jobs:
   update-template:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,17 +20,14 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
-      
+        run: pip install requests
 
       - name: Scrape and update VER
         id: update_ver
         run: |
-          python3 - <<EOF
-          import requests, re, os, io
+          python3 - <<'EOF'
+          import requests, re, os
           import xml.etree.ElementTree as ET
-          import xml.dom.minidom
-          from bs4 import BeautifulSoup
           from pathlib import Path
 
           url = "https://www.feed-the-beast.com/modpacks/126-ftb-presents-direwolf20-121"
@@ -37,72 +35,78 @@ jobs:
 
           print("🔎 Fetching latest modpack version...")
 
-          # Grab latest version ID
-          r = requests.get(url)
-          soup = BeautifulSoup(r.text, "html.parser")
-          latest_ver = soup.find("div", class_="Badge_value__1GilC").text.strip()
+          res = requests.get(url, timeout=30)
+          res.raise_for_status()
+
+          # Strip HTML and extract "Latest Version ID <number>"
+          clean = re.sub(r'<[^>]+>', ' ', res.text)
+          match = re.search(r'Latest\s+Version\s+ID\s+(\d+)', clean, flags=re.I)
+
+          if not match:
+              print("❌ Could not find Latest Version ID on page")
+              exit(1)
+
+          latest_ver = match.group(1)
           print(f"📦 Latest version found: {latest_ver}")
 
-          # Grab current version ID from XML
-          original = xml_path.read_text()
-          current_match = re.search(r'<Config[^>]*Name="VER"[^>]*Default="(\d+)"', original)
+          # Read current XML
+          original = xml_path.read_text(encoding="utf-8")
+          current_match = re.search(
+              r'<Config[^>]*Name="VER"[^>]*Default="(\d+)"',
+              original
+          )
           current_ver = current_match.group(1) if current_match else "Unknown"
           print(f"📁 Current version in XML: {current_ver}")
 
-          # Compare Version ID
           if current_ver == latest_ver:
               print("✅ No update needed. Version unchanged.")
               with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                   f.write("updated=false\n")
               exit(0)
 
-          # Replace updated VER ID in xml file
+          # Update XML
           tree = ET.parse(xml_path)
           root = tree.getroot()
-          for config in root.findall('Config'):
-              if config.attrib.get('Name') == 'VER':
-                  config.set('Default', latest_ver)
+
+          for config in root.findall("Config"):
+              if config.attrib.get("Name") == "VER":
+                  config.set("Default", latest_ver)
                   config.text = latest_ver
                   break
 
-          def pretty_print_custom(elem, level=0):
-            indent = "  "
-            pad = indent * level
+          def pretty_print(elem, level=0):
+              indent = "  "
+              pad = indent * level
 
-            if elem.tag == "Config":
-              result = f"{pad}<{elem.tag}\n"
-              for key, val in elem.attrib.items():
-                result += f"{pad}{indent}{key}=\"{val}\"\n"
-              if elem.text and elem.text.strip():
-                result = result.rstrip()  # Remove trailing newline
-                result += f">{elem.text}</{elem.tag}>\n"
-              else:
-                result = result.rstrip()
-                result += "/>\n"
-              return result
+              if elem.tag == "Config":
+                  out = f"{pad}<{elem.tag}\n"
+                  for k, v in elem.attrib.items():
+                      out += f"{pad}{indent}{k}=\"{v}\"\n"
+                  if elem.text and elem.text.strip():
+                      out = out.rstrip() + f">{elem.text}</{elem.tag}>\n"
+                  else:
+                      out = out.rstrip() + "/>\n"
+                  return out
 
-            if (not elem.text or not elem.text.strip()) and len(elem) == 0:
-              return f"{pad}<{elem.tag}/>\n"
+              if not elem.text and len(elem) == 0:
+                  return f"{pad}<{elem.tag}/>\n"
 
-            if elem.text and elem.text.strip():
-              return f"{pad}<{elem.tag}>{elem.text.strip()}</{elem.tag}>\n"
+              out = f"{pad}<{elem.tag}>\n"
+              for child in elem:
+                  out += pretty_print(child, level + 1)
+              out += f"{pad}</{elem.tag}>\n"
+              return out
 
-            result = f"{pad}<{elem.tag}>\n"
-            for child in elem:
-              result += pretty_print_custom(child, level + 1)
-            result += f"{pad}</{elem.tag}>\n"
-            return result
+          final_xml = '<?xml version="1.0"?>\n' + pretty_print(root)
 
-          final_xml = '<?xml version="1.0"?>\n' + pretty_print_custom(root)
-
-          if original != final_xml:
+          if final_xml != original:
               print("✏️ Updating XML file with new version...")
-              xml_path.write_text(final_xml, encoding='utf-8')
+              xml_path.write_text(final_xml, encoding="utf-8")
               with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                   f.write("updated=true\n")
                   f.write(f"version={latest_ver}\n")
           else:
-              print("⚠️ Content already up to date.")
+              print("⚠️ XML already up to date.")
               with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                   f.write("updated=false\n")
           EOF
