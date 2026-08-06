@@ -93,9 +93,9 @@
     Type="Variable"
     Name="VER"
     Target="VER"
-    Default="100412"
+    Default="100450"
     Description="Version of the modpack to download."
     Display="always"
     Required="false"
-    Mask="false">100412</Config>
+    Mask="false">100450</Config>
 </Container>
